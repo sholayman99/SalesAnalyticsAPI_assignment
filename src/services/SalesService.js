@@ -27,11 +27,13 @@ const TotalRevenueService = async(req,res) =>{
 //quantity-by-product Service
 const QuantityByProductService = async(req,res) =>{
    try {
+       let matchStage = {$match:{}};
        let totalQuantitySold = {$sum:"$quantity"};
        let groupByStage = {
            $group:{"_id": "$product" , totalQuantitySold }
        }
-       let data = await  SalesModel.aggregate([groupByStage]);
+       let sortStage ={$sort:{totalQuantitySold:1}}
+       let data = await  SalesModel.aggregate([matchStage,groupByStage,sortStage]);
        return {status:"success" , data:data}
    }catch (e) {
        return {status:"failed" , data:e}.toString()
@@ -41,6 +43,7 @@ const QuantityByProductService = async(req,res) =>{
 //top-products Service
 const TopProductsService = async(req,res) =>{
      try {
+         let matchStage = {$match:{}};
          let multiplyQuantityPrice = { $multiply:["$quantity","$price"]};
          let totalRevenue = {$sum:multiplyQuantityPrice};
          let groupByStage = {
@@ -49,7 +52,7 @@ const TopProductsService = async(req,res) =>{
          let sortByRevenueStage = {$sort:{totalRevenue:-1}};
          let limitStage = {$limit:5}
          let data = await SalesModel.aggregate([
-             groupByStage,sortByRevenueStage,limitStage
+             matchStage, groupByStage,sortByRevenueStage,limitStage
          ]);
          return {status:"success" , data:data}
      }catch (e) {
@@ -61,13 +64,12 @@ const TopProductsService = async(req,res) =>{
 const AveragePriceService = async(req,res) =>{
     try {
         let matchStage = {$match:{}};
-        let avgPrice ={$avg:"$price"};
-        let groupStage ={$group:{
-            "_id":null , avgPrice:avgPrice
-            }};
-        let projectStage = {$project:{
-            "$data._id":0
-            }}
+        let groupStage ={
+            $group: {
+                _id: null,
+                averagePrice: { $avg: "$price" }
+            }
+        }
         let data = await  SalesModel.aggregate([
             matchStage,groupStage
         ]);
@@ -115,7 +117,17 @@ const HighestQuantitySoldService = async(req,res) =>{
 
 //department-salary-expense Service
 const DepartmentSalaryExpenseService = async(req,res) =>{
-
+    try{
+        let matchStage = {$match:{}}
+        let totalSalary = {$sum:"$salary"}
+        let groupStage = {$group:{
+            "_id":"$department", totalSalary:totalSalary
+            }}
+        let data = await SalesModel.aggregate([matchStage,groupStage]);
+        return {status:"success" , data:data}
+    }catch (e) {
+        return {status:"failed" , data:e}.toString()
+    }
 }
 
 
