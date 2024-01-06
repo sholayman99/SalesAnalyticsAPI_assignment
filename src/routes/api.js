@@ -6,6 +6,11 @@
 
 const express = require("express");
 const router = express.Router();
+const SalesController = require("../controllers/SalesController")
+
+router.post("/CreateSales" , SalesController.CreateSales)
+
+
 
 
 module.exports = router;
