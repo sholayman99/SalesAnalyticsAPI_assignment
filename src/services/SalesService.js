@@ -70,7 +70,6 @@ const AveragePriceService = async(req,res) =>{
             }
         }
 
-
         let data = await  SalesModel.aggregate([
             matchStage,groupStageByProduct
         ]);
