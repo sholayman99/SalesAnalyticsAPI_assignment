@@ -8,7 +8,7 @@ const express = require("express");
 const router = express.Router();
 const SalesController = require("../controllers/SalesController")
 
-router.post("/CreateSales" , SalesController.CreateSales)
+
 router.get("/total-revenue", SalesController.TotalRevenue);
 router.get("/quantity-by-product", SalesController.QuantityByProduct);
 router.get("/top-products",SalesController.TopProducts);
